@@ -72,6 +72,7 @@ export function DatasetDirectory(inPath: string, inName: string) {
 
 export function RealmDirectory(inPath: string, inName: string) {
     return generateTree(path.join(inPath,inName),dir({
+        aio: dir({}),
         worldserver_conf: file('worldserver.conf'),
         worldserver_conf_dist: file('worldserver.conf.dist'),
         config: file(`realm.conf`),
@@ -146,6 +147,8 @@ export function AddonDirectory(inPath: string) {
         build: dir({
             lualib_bundle_lua: file('lualib_bundle.lua'),
             lib: dir({}),
+            addon: dir({}),
+            shared: dir({}),
         }),
     }))
 }

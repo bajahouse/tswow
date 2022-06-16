@@ -296,15 +296,26 @@ export class Addon {
         });
         let tocfile = wfs.readLines(dataset.path.luaxml_source.Interface.FrameXML.framexml_toc);
         dataset.modules()
-            .filter(mod=>mod.addon.path.build.exists())
-            .forEach(mod=>{
-                mod.addon.addFilelistToToc(tocfile);
-                mod.addon.path.build.copy(
-                    dataset.path.luaxml.Interface.FrameXML.TSAddons.mod
-                        .pick(mod.relativePath.get()
-                    )
-                )
-            })
+            .filter(mod => mod.addon.path.build.exists())
+            .forEach(mod => {
+            mod.addon.addFilelistToToc(tocfile);
+            wfs.copy(mod.addon.path.build.lualib_bundle_lua, mpath(dataset.path.luaxml.Interface.FrameXML.TSAddons.join(mod.fullName.split('.').join('/')), 'lualib_bundle.lua'));
+            wfs.iterate(mod.addon.path.build.addon, (fpath) => {
+                if (fpath.endsWith('.aio.lua')) {
+                    //copy to aio folder in realms/aio
+                    dataset.realms().forEach((v, i, arr) => {
+                        wfs.copy(fpath, mpath(v.path.aio, wfs.basename(fpath)));
+                    });
+                }
+                else {
+                    wfs.copy(fpath, mpath(dataset.path.luaxml.Interface.FrameXML.TSAddons.join(fpath.replace('\\addon\\build', '').replace('modules', ''))));
+                }
+            });
+            if (mod.addon.path.build.shared.exists())
+                wfs.iterate(mod.addon.path.build.shared, (fpath) => {
+                    wfs.copy(fpath, mpath(dataset.path.luaxml.Interface.FrameXML.TSAddons.join(mod.fullName.split('.').join('/') + '/shared'), wfs.basename(fpath)));
+                });
+        });
         wfs.writeLines(dataset.path.luaxml.Interface.FrameXML.framexml_toc, tocfile);
         dataset.path.luaxml.copy(dataset.client.path.Data.devPatch)
     }

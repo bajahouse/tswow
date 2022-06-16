@@ -78,7 +78,7 @@ export const RequirePreload: Plugin = {
             let addonName = splitAddon.slice(1).join('addon');
 
             // ignore entrypoint
-            if(addonName === '/addon.ts') return fileContent;
+            if(addonName === '/addon.ts' || addonName.endsWith('.aio.ts')) return fileContent;
 
             moduleName = `TSAddons/${modName}/addon${addonName}`
           } else {
